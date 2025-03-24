@@ -1,0 +1,130 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light mode - Grayscale base */
+    --bg-app: #ffffff;
+    --bg-surface-light: #f8f9fa;
+    --bg-surface-dark: #f1f3f5;
+    --text-primary: #212529;
+    --text-secondary: #495057;
+    --text-muted: #868e96;
+    --border-color: #dee2e6;
+    
+    /* Light mode - Accent colors */
+    --primary-light: #228be6;  /* Blue */
+    --primary-dark: #1c7ed6;
+    --secondary-light: #fab005;  /* Gold */
+    --secondary-dark: #f59f00;
+    
+    /* Light mode - Semantic colors */
+    --success-light: #40c057;
+    --success-dark: #37b24d;
+    --error-light: #fa5252;
+    --error-dark: #f03e3e;
+    --warning-light: #fab005;
+    --warning-dark: #f59f00;
+    --info-light: #228be6;
+    --info-dark: #1c7ed6;
+  }
+
+  .dark {
+    /* Dark mode - Grayscale base */
+    --bg-app: #212529;
+    --bg-surface-light: #343a40;
+    --bg-surface-dark: #495057;
+    --text-primary: #f8f9fa;
+    --text-secondary: #dee2e6;
+    --text-muted: #adb5bd;
+    --border-color: #495057;
+    
+    /* Dark mode - Accent colors */
+    --primary-light: #74c0fc;  /* Lighter blue */
+    --primary-dark: #339af0;
+    --secondary-light: #ffd43b;  /* Lighter gold */
+    --secondary-dark: #fcc419;
+    
+    /* Dark mode - Semantic colors */
+    --success-light: #51cf66;
+    --success-dark: #40c057;
+    --error-light: #ff6b6b;
+    --error-dark: #fa5252;
+    --warning-light: #ffd43b;
+    --warning-dark: #fcc419;
+    --info-light: #74c0fc;
+    --info-dark: #339af0;
+  }
+}
+
+@layer components {
+  /* Base button styles */
+  .btn {
+    @apply px-4 py-2 rounded-md font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+
+  /* Primary button - Blue */
+  .btn-primary {
+    @apply btn bg-primary-light hover:bg-primary-dark text-white focus:ring-primary-light dark:bg-primary-light dark:hover:bg-primary-dark dark:focus:ring-primary-light;
+  }
+
+  /* Secondary button - Gold */
+  .btn-secondary {
+    @apply btn bg-secondary-light hover:bg-secondary-dark text-gray-900 focus:ring-secondary-light dark:bg-secondary-light dark:hover:bg-secondary-dark dark:focus:ring-secondary-light;
+  }
+
+  /* Ghost button */
+  .btn-ghost {
+    @apply btn text-primary hover:bg-surface-light dark:text-primary dark:hover:bg-surface-light;
+  }
+
+  /* Input styles */
+  .input {
+    @apply w-full px-3 py-2 rounded-md border border-border bg-surface-light text-primary placeholder-muted focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-transparent dark:bg-surface-light dark:border-border dark:text-primary dark:placeholder-muted dark:focus:ring-primary-light;
+  }
+
+  /* Card styles */
+  .card {
+    @apply bg-surface-light rounded-lg shadow-sm border border-border dark:bg-surface-light dark:border-border;
+  }
+
+  /* Link styles */
+  .link {
+    @apply text-primary-light hover:text-primary-dark underline-offset-4 hover:underline dark:text-primary-light dark:hover:text-primary-dark;
+  }
+
+  /* Badge styles */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-primary {
+    @apply badge bg-primary-light/10 text-primary-light dark:bg-primary-light/10 dark:text-primary-light;
+  }
+
+  .badge-secondary {
+    @apply badge bg-secondary-light/10 text-secondary-light dark:bg-secondary-light/10 dark:text-secondary-light;
+  }
+
+  /* Alert styles */
+  .alert {
+    @apply p-4 rounded-md border;
+  }
+
+  .alert-success {
+    @apply alert bg-success-light/10 border-success-light text-success-light dark:bg-success-light/10 dark:border-success-light dark:text-success-light;
+  }
+
+  .alert-error {
+    @apply alert bg-error-light/10 border-error-light text-error-light dark:bg-error-light/10 dark:border-error-light dark:text-error-light;
+  }
+
+  .alert-warning {
+    @apply alert bg-warning-light/10 border-warning-light text-warning-light dark:bg-warning-light/10 dark:border-warning-light dark:text-warning-light;
+  }
+
+  .alert-info {
+    @apply alert bg-info-light/10 border-info-light text-info-light dark:bg-info-light/10 dark:border-info-light dark:text-info-light;
+  }
+} 
