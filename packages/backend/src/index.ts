@@ -19,7 +19,7 @@ app.use(morgan('combined', { stream }));
 
 // Routes
 app.get('/health', wrapHandler(health));
-app.use('/api/auth', authRoutes);
+app.use('/auth', authRoutes);
 
 // Create server instance
 const server = app.listen(port, () => {

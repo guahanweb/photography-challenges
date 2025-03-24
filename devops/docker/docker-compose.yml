@@ -37,28 +37,15 @@ services:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - AWS_REGION=${AWS_REGION}
-      - DYNAMODB_ENDPOINT=${DYNAMODB_ENDPOINT}
-      - S3_ENDPOINT=${S3_ENDPOINT}
-      - LAMBDA_ENDPOINT=${LAMBDA_ENDPOINT}
-      - APIGATEWAY_ENDPOINT=${APIGATEWAY_ENDPOINT}
+      - AWS_ENDPOINT_URL=http://localstack:4566
+      - S3_ENDPOINT=http://localstack:4566
+      - LAMBDA_ENDPOINT=http://localstack:4566
+      - APIGATEWAY_ENDPOINT=http://localstack:4566
+      - DYNAMODB_ENDPOINT=http://localstack:4566
+      - DYNAMODB_USERS_TABLE=${DYNAMODB_USERS_TABLE}
     command: npm run dev --workspace=packages/backend -- --host 0.0.0.0
     depends_on:
-      - dynamodb-local
       - localstack
-
-  # Local DynamoDB
-  dynamodb-local:
-    image: amazon/dynamodb-local:latest
-    ports:
-      - "${DYNAMODB_PORT}:8000"
-    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath /data"
-    volumes:
-      - dynamodb-data:/data
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8000/shell/ || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   # LocalStack for AWS services simulation
   localstack:

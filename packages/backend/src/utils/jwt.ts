@@ -1,18 +1,19 @@
 import jwt from 'jsonwebtoken';
 import { logger } from './logger';
+import { User } from '@guahanweb-photography-challenges/shared';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
 
 export interface JWTPayload {
-  userId: string;
   email: string;
   roles: string[];
+  createdAt: string;
 }
 
-export const generateToken = (payload: JWTPayload): string => {
+export const generateToken = (user: Omit<User, 'passwordHash' | 'salt'>): string => {
   try {
-    return jwt.sign(payload, JWT_SECRET as jwt.Secret, {
+    return jwt.sign(user, JWT_SECRET as jwt.Secret, {
       expiresIn: JWT_EXPIRES_IN as jwt.SignOptions['expiresIn'],
     });
   } catch (error) {

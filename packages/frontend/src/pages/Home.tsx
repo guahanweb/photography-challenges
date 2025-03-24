@@ -15,18 +15,6 @@ export default function Home() {
         >
           View Challenges
         </Link>
-        <Link
-          to="/login"
-          className="inline-block bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600"
-        >
-          Login
-        </Link>
-        <Link
-          to="/register"
-          className="inline-block bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600"
-        >
-          Register
-        </Link>
       </div>
     </div>
   );

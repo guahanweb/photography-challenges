@@ -26,10 +26,10 @@ export default function Register() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-md mx-auto">
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="w-full max-w-md mx-auto px-4">
         <div className="card p-6">
-          <h1 className="text-2xl font-bold mb-6">Register</h1>
+          <h1 className="card-header">Register</h1>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="name" className="block text-sm font-medium mb-1">

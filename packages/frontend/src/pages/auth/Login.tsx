@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNotifications } from '../../contexts/NotificationContext';
 
@@ -11,23 +11,27 @@ export default function Login() {
   const { login } = useAuth();
   const { addNotification } = useNotifications();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await login(formData.email, formData.password);
       addNotification('success', 'Successfully logged in!');
-      navigate('/challenges');
+
+      // Navigate to the attempted route or default to challenges
+      const from = (location.state as { from?: string })?.from || '/challenges';
+      navigate(from, { replace: true });
     } catch (error) {
       addNotification('error', 'Failed to log in. Please check your credentials.');
     }
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-md mx-auto">
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="w-full max-w-md mx-auto px-4">
         <div className="card p-6">
-          <h1 className="text-2xl font-bold mb-6">Login</h1>
+          <h1 className="card-header">Login</h1>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-sm font-medium mb-1">
