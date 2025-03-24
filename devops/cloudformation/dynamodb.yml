@@ -27,9 +27,108 @@ Resources:
         - Key: Project
           Value: photography-challenges
 
+  ProjectsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub photography-challenges-projects-${Environment}
+      AttributeDefinitions:
+        - AttributeName: projectId
+          AttributeType: S
+        - AttributeName: version
+          AttributeType: N
+      KeySchema:
+        - AttributeName: projectId
+          KeyType: HASH
+        - AttributeName: version
+          KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Project
+          Value: photography-challenges
+
+  ProjectInstancesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub photography-challenges-project-instances-${Environment}
+      AttributeDefinitions:
+        - AttributeName: instanceId
+          AttributeType: S
+        - AttributeName: type
+          AttributeType: S
+        - AttributeName: assignedTo
+          AttributeType: S
+        - AttributeName: assignedBy
+          AttributeType: S
+        - AttributeName: status
+          AttributeType: S
+      KeySchema:
+        - AttributeName: instanceId
+          KeyType: HASH
+        - AttributeName: type
+          KeyType: RANGE
+      GlobalSecondaryIndexes:
+        - IndexName: UserProjectsIndex
+          KeySchema:
+            - AttributeName: assignedTo
+              KeyType: HASH
+            - AttributeName: status
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: 5
+            WriteCapacityUnits: 5
+        - IndexName: MentorProjectsIndex
+          KeySchema:
+            - AttributeName: assignedBy
+              KeyType: HASH
+            - AttributeName: status
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: 5
+            WriteCapacityUnits: 5
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Project
+          Value: photography-challenges
+
 Outputs:
   UsersTableName:
     Description: Name of the Users DynamoDB table
     Value: !Ref UsersTable
     Export:
-      Name: !Sub ${AWS::StackName}-UsersTableName 
+      Name: !Sub ${AWS::StackName}-UsersTableName
+
+  ProjectsTableName:
+    Description: Name of the Projects table
+    Value: !Ref ProjectsTable
+    Export:
+      Name: !Sub ${AWS::StackName}-ProjectsTableName
+
+  ProjectInstancesTableName:
+    Description: Name of the ProjectInstances table
+    Value: !Ref ProjectInstancesTable
+    Export:
+      Name: !Sub ${AWS::StackName}-ProjectInstancesTableName
+
+  ProjectsTableArn:
+    Description: ARN of the Projects table
+    Value: !GetAtt ProjectsTable.Arn
+    Export:
+      Name: !Sub ${AWS::StackName}-ProjectsTableArn
+
+  ProjectInstancesTableArn:
+    Description: ARN of the ProjectInstances table
+    Value: !GetAtt ProjectInstancesTable.Arn
+    Export:
+      Name: !Sub ${AWS::StackName}-ProjectInstancesTableArn 
