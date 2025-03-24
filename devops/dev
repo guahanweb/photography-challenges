@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+
+# Get the directory where this script is located
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# Load environment variables
+set -o allexport
+source "${DIR}/docker/.env"
+set +o allexport
+
+DOCKER_COMPOSE_CMD="docker compose -f ${DIR}/docker/docker-compose.yml"
+
+CMD=${1}
+if [ -z "${CMD}" ]; then
+    echo "Usage: dev start|stop|restart|redeploy|exec|localstack [service] [command]"
+    exit 1
+fi
+shift
+
+case ${CMD} in
+    start)
+        ${DOCKER_COMPOSE_CMD} up --force-recreate --remove-orphans --detach
+        echo ""
+        echo "Development environment is running."
+        echo "Frontend: http://localhost:${FRONTEND_PORT}"
+        echo "Backend API: http://localhost:${BACKEND_PORT}"
+        echo "DynamoDB Local: http://localhost:${DYNAMODB_PORT}"
+        echo "LocalStack: http://localhost:${LOCALSTACK_PORT}"
+        ;;
+
+    stop)
+        ${DOCKER_COMPOSE_CMD} down --remove-orphans --volumes
+        echo ""
+        echo "Development environment is stopped."
+        ;;
+
+    restart)
+        service=${1}
+        if [ -z "${service}" ]; then
+            echo "Usage: dev restart <service>"
+            exit 1
+        fi
+
+        ${DOCKER_COMPOSE_CMD} stop ${service}
+        ${DOCKER_COMPOSE_CMD} rm --force ${service}
+        ${DOCKER_COMPOSE_CMD} create ${service}
+        ${DOCKER_COMPOSE_CMD} start ${service}
+        ;;
+
+    redeploy)
+        service=${1}
+        if [ -z "${service}" ]; then
+            echo "Usage: dev redeploy <service>"
+            exit 1
+        fi
+
+        ${DOCKER_COMPOSE_CMD} build ${service}
+        ${DOCKER_COMPOSE_CMD} stop ${service}
+        ${DOCKER_COMPOSE_CMD} rm --force ${service}
+        ${DOCKER_COMPOSE_CMD} create ${service}
+        ${DOCKER_COMPOSE_CMD} start ${service}
+        ;;
+
+    exec)
+        service=${1}
+        if [ -z "${service}" ]; then
+            echo "Usage: dev exec <service> <command>"
+            exit 1
+        fi
+        shift
+
+        docker exec -it ${service} "$@"
+        ;;
+
+    localstack)
+        subcmd=${1}
+        if [ -z "${subcmd}" ]; then
+            echo "Usage: dev localstack [build_lambda|create_lambda|update_lambda] <function_name>"
+            exit 1
+        fi
+        
+        case ${subcmd} in
+            build_lambda)
+                function_name=${2}
+                if [ -z "${function_name}" ]; then
+                    echo "Usage: dev localstack build_lambda <function_name>"
+                    exit 1
+                fi
+                # TODO: Implement Lambda build function
+                ;;
+            create_lambda)
+                function_name=${2}
+                if [ -z "${function_name}" ]; then
+                    echo "Usage: dev localstack create_lambda <function_name>"
+                    exit 1
+                fi
+                # TODO: Implement Lambda creation function
+                ;;
+            update_lambda)
+                function_name=${2}
+                if [ -z "${function_name}" ]; then
+                    echo "Usage: dev localstack update_lambda <function_name>"
+                    exit 1
+                fi
+                # TODO: Implement Lambda update function
+                ;;
+            *)
+                echo "Usage: dev localstack [build_lambda|create_lambda|update_lambda] <function_name>"
+                exit 1
+                ;;
+        esac
+        ;;
+
+    *)
+        echo "Usage: dev start|stop|restart|redeploy|exec|localstack [service] [command]"
+        exit 1
+        ;;
+esac 

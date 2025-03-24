@@ -1,0 +1,55 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Project Purpose
+
+- Explore and experiment with the power of Cursor rules and see how rapidly I can build a stable production product
+- Publish a web application to assist with creating photography challenges and assign them to friends
+
+# Project Architecture
+
+- Monorepo structure using npm workspaces
+- All application source code - both frontend and backend - will be written in TypeScript
+
+# Code Strategies
+
+- All workspaces must use a modular design and create well-testable code
+- Unit tests will be required for components and happy-path flows, at minimum
+
+# Backend
+
+- All route handlers (controllers) are to be logically self-contained as they will eventually become AWS Lambda functions
+- During development, these route handlers will be wrapped in an Express wrapper that mirrors the future Lambda invocation
+- Authorization will be RBAC using JWT auth for the first iteration
+- All routes will use a logical auth check (in the Express environment, this will be middleware while it will become an API Gateway Authorizer lambda in the hosted environment)
+
+# Frontend
+
+- The frontend will be a React application using very structured state management
+- All styles will be tailwindcss and favor a very minimalistic design, accentuating the photographs, not the website design
+- Routing strategies should be planned well, and we will support deep linking to primary sections and items within the app
+- Use of clean iconography and fonts is a necessity (react-icons/fi are a great choice)
+
+# Data Storage
+
+- NoSql storage will be used as our primary data storage (using DynamoDB)
+- Any real-time communication will be supported using ValKey PubSub (both locally and hosted)
+- ValKey will also give us support for caching needs
+- Images will be processed on upload, and we will store them in S3 (both originals and resized copies)
+
+# Infrastructure
+
+- Our ultimate hosted environment will be AWS using API Gateway + Lambda for our api routes and CloudFront + S3 for our static site (as well as images)
+- We will replicate this environment locally using Localstack and will want our devops scripts to be able to run against localhost or hosted aws
+- When initially working with the Express server, we will use docker to set up networking
+- We will use docker-compose to create a local environment the fully reflects our desired production state
+
+# Configuration
+
+- All application layers will be configuration driven
+- Leveraging the appropriate `dotenv` support with a config module will be required and priority
+- Each application (workspace) will be provided appropriate environmental configuration at startup (either via .env file or docker-compose)
+

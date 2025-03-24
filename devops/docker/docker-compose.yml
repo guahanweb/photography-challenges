@@ -1,0 +1,89 @@
+services:
+  # Frontend development server
+  frontend:
+    build:
+      context: ../..
+      dockerfile: devops/docker/frontend.Dockerfile
+      target: development
+    ports:
+      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+    volumes:
+      - ../../packages/frontend:/app/packages/frontend
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=${VITE_API_URL}
+      - VITE_HOST=0.0.0.0
+      - VITE_PORT=${FRONTEND_PORT}
+      - VITE_API_URL=http://backend:4000
+    command: npm run dev --workspace=packages/frontend -- --host 0.0.0.0
+    depends_on:
+      - backend
+
+  # Backend development server
+  backend:
+    build:
+      context: ../..
+      dockerfile: devops/docker/backend.Dockerfile
+      target: development
+    ports:
+      - "${BACKEND_PORT}:4000"
+    volumes:
+      - ../../packages/backend:/app/packages/backend
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - PORT=4000
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION}
+      - DYNAMODB_ENDPOINT=${DYNAMODB_ENDPOINT}
+      - S3_ENDPOINT=${S3_ENDPOINT}
+      - LAMBDA_ENDPOINT=${LAMBDA_ENDPOINT}
+      - APIGATEWAY_ENDPOINT=${APIGATEWAY_ENDPOINT}
+    command: npm run dev --workspace=packages/backend -- --host 0.0.0.0
+    depends_on:
+      - dynamodb-local
+      - localstack
+
+  # Local DynamoDB
+  dynamodb-local:
+    image: amazon/dynamodb-local:latest
+    ports:
+      - "${DYNAMODB_PORT}:8000"
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath /data"
+    volumes:
+      - dynamodb-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/shell/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # LocalStack for AWS services simulation
+  localstack:
+    image: localstack/localstack:latest
+    ports:
+      - "${LOCALSTACK_PORT}:4566"
+    environment:
+      - SERVICES=${LOCALSTACK_SERVICES}
+      - DEFAULT_REGION=${AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - LAMBDA_EXECUTOR=${LAMBDA_EXECUTOR}
+      - LAMBDA_REMOTE_DOCKER=${LAMBDA_REMOTE_DOCKER}
+      - LAMBDA_DOCKER_NETWORK=${LAMBDA_DOCKER_NETWORK}
+      - LAMBDA_DOCKER_HOST=${LAMBDA_DOCKER_HOST}
+    volumes:
+      - localstack-data:/var/lib/localstack/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:4566/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  dynamodb-data:
+  localstack-data: 

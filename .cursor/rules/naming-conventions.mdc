@@ -1,0 +1,10 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Project Naming Conventions
+
+- Root project name: `@guahanweb/photography-challenges`
+- Workflow names: `@guahanweb-photography-challenges/${workspace-name}`
