@@ -16,6 +16,10 @@ const envSchema = z.object({
   AWS_ENDPOINT_URL: z.string().optional(),
   // DynamoDB Configuration
   DYNAMODB_USERS_TABLE: z.string().min(1, 'DYNAMODB_USERS_TABLE is required'),
+  DYNAMODB_PROJECTS_TABLE: z.string().min(1, 'DYNAMODB_PROJECTS_TABLE is required'),
+  DYNAMODB_PROJECT_INSTANCES_TABLE: z
+    .string()
+    .min(1, 'DYNAMODB_PROJECT_INSTANCES_TABLE is required'),
 });
 
 const parseEnvVars = () => {

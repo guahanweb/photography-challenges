@@ -5,8 +5,10 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import { logger, stream } from './config/logger';
 import { wrapHandler } from './utils/handlerWrapper';
-import { health } from './controllers/healthController';
+import { healthController } from './controllers/health';
 import authRoutes from './routes/auth';
+import projectRoutes from './routes/projects';
+import challengeRoutes from './routes/challenges';
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -18,8 +20,10 @@ app.use(express.json());
 app.use(morgan('combined', { stream }));
 
 // Routes
-app.get('/health', wrapHandler(health));
 app.use('/auth', authRoutes);
+app.use('/projects', projectRoutes);
+app.use('/challenges', challengeRoutes);
+app.use('/health', wrapHandler(healthController.check));
 
 // Create server instance
 const server = app.listen(port, () => {

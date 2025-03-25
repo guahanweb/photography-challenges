@@ -95,6 +95,7 @@ export interface ProjectInstance {
   };
   createdAt: string;
   updatedAt: string;
+  deleted?: boolean;
 }
 
 export interface ProjectSubmission {

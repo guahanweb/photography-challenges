@@ -43,6 +43,8 @@ services:
       - APIGATEWAY_ENDPOINT=http://localstack:4566
       - DYNAMODB_ENDPOINT=http://localstack:4566
       - DYNAMODB_USERS_TABLE=${DYNAMODB_USERS_TABLE}
+      - DYNAMODB_PROJECTS_TABLE=${DYNAMODB_PROJECTS_TABLE}
+      - DYNAMODB_PROJECT_INSTANCES_TABLE=${DYNAMODB_PROJECT_INSTANCES_TABLE}
     command: npm run dev --workspace=packages/backend -- --host 0.0.0.0
     depends_on:
       - localstack

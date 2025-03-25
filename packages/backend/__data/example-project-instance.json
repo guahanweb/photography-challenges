@@ -1,0 +1,68 @@
+{
+  "instanceId": "unique-instance-id",
+  "projectId": "original-project-id",
+  "assignedTo": "jaden-user-id",
+  "assignedBy": "mentor-user-id",
+  "status": "IN_PROGRESS",
+
+  "actualDates": {
+    "startDate": "2025-03-25T00:00:00Z",
+    "scheduledEndDate": "2025-04-01T00:00:00Z",
+    "actualEndDate": null,
+    "lastActivity": "2025-03-26T15:30:00Z"
+  },
+
+  "progress": {
+    "daysCompleted": 2,
+    "totalDays": 7,
+    "completionPercentage": 28.57,
+    "milestonesReached": []
+  },
+
+  "submissions": [
+    {
+      "day": 1,
+      "date": "2025-03-25T00:00:00Z",
+      "mediaUrls": ["https://example.com/storage/photos/day1_mar25.jpg"],
+      "notes": "First day selfie by the window!",
+      "feedback": {
+        "text": "Love the natural lighting! Your smile looks so genuine.",
+        "givenAt": "2025-03-25T12:30:00Z",
+        "givenBy": "mentor-user-id"
+      }
+    },
+    {
+      "day": 2,
+      "date": "2025-03-26T00:00:00Z",
+      "mediaUrls": [
+        "https://example.com/storage/photos/day2_mar26_1.jpg",
+        "https://example.com/storage/photos/day2_mar26_2.jpg"
+      ],
+      "notes": "Tried high and low angles today!",
+      "feedback": null
+    }
+  ],
+
+  "communicationThread": [
+    {
+      "messageId": "msg-1",
+      "senderId": "jaden-user-id",
+      "text": "I'm excited to start this challenge!",
+      "timestamp": "2025-03-24T10:15:00Z"
+    },
+    {
+      "messageId": "msg-2",
+      "senderId": "mentor-user-id",
+      "text": "Can't wait to see what you come up with!",
+      "timestamp": "2025-03-24T10:20:00Z"
+    }
+  ],
+
+  "reflections": {
+    "midpoint": null,
+    "final": null
+  },
+
+  "createdAt": "2025-03-24T00:00:00Z",
+  "updatedAt": "2025-03-26T15:30:00Z"
+}

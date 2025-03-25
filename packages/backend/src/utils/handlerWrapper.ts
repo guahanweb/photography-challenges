@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import { BaseHandler } from '../types/handlers';
 import { logger } from '../config/logger';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 
@@ -20,14 +19,16 @@ const expressToApiGatewayEvent = (req: Request): APIGatewayProxyEvent => {
   };
 };
 
-export const wrapHandler = (handler: BaseHandler) => {
+type LambdaHandler = (event: APIGatewayProxyEvent) => Promise<APIGatewayProxyResult>;
+
+export const wrapHandler = (handler: LambdaHandler) => {
   return async (req: Request, res: Response): Promise<void> => {
     try {
       // Transform Express request to API Gateway event
       const event = expressToApiGatewayEvent(req);
 
       // Call handler with API Gateway event
-      const result = (await handler(event, {})) as APIGatewayProxyResult;
+      const result = await handler(event);
 
       // Handle API Gateway response
       if (result.statusCode) {
@@ -49,18 +50,18 @@ export const wrapHandler = (handler: BaseHandler) => {
         res.send(result.body);
       }
     } catch (error) {
-      logger.error('Handler error:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+      logger.error('Error in handler:', error);
+      res.status(500).json({ message: 'Internal server error' });
     }
   };
 };
 
-export const withErrorHandling = (handler: BaseHandler): BaseHandler => {
-  return async (event, context) => {
+export const withErrorHandling = (handler: LambdaHandler): LambdaHandler => {
+  return async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     try {
-      return await handler(event, context);
+      return await handler(event);
     } catch (error) {
-      console.error('Error in handler:', error);
+      logger.error('Error in handler:', error);
       return {
         statusCode: 500,
         body: JSON.stringify({ message: 'Internal server error' }),

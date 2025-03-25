@@ -1,0 +1,108 @@
+{
+  "projectId": "unique-id-string",
+  "projectNumber": 7,
+  "title": "Selfie of the Day",
+  "shortDescription": "A brief introduction to selfie photography",
+  "fullDescription": "Welcome to your first photography challenge! 📸 We're starting with something fun and simple - daily selfies!...",
+
+  "duration": {
+    "days": 7,
+    "startDate": null,
+    "endDate": null
+  },
+
+  "mission": {
+    "text": "Take and share at least one selfie each day. That's it! It can be any kind of selfie you want - serious, silly, artsy, casual, whatever feels right in the moment.",
+    "dailyRequirements": ["Take at least one selfie"]
+  },
+
+  "rules": [
+    "Your face should be visible in some way (even partially)",
+    "The photo must be taken by you (that's what makes it a selfie!)",
+    "Indoor or outdoor - your choice",
+    "Any time of day works"
+  ],
+
+  "tips": [
+    {
+      "title": "Angles",
+      "description": "Try different angles - high, low, or straight on"
+    },
+    {
+      "title": "Expressions",
+      "description": "Play with different expressions"
+    },
+    {
+      "title": "Lighting",
+      "description": "Test out different lighting (window light looks amazing!)"
+    },
+    {
+      "title": "Backgrounds",
+      "description": "Experiment with different backgrounds"
+    },
+    {
+      "title": "Ideas",
+      "description": "Morning coffee selfie? After-school victory pose? Bedtime peace sign? You decide!"
+    }
+  ],
+
+  "reminders": [
+    "These photos are just between us",
+    "Quality isn't important - having fun is!",
+    "Questions? Just ask! I'm here to help",
+    "Multiple photos per day are totally fine",
+    "You can always redo a day if you want"
+  ],
+
+  "sharingInstructions": [
+    "Find your challenge folder in our shared Google Drive",
+    "Open the 'photos' subfolder",
+    "Name your file with the day number and date (example: 'Day1_Jan30')",
+    "Upload your photo(s)"
+  ],
+
+  "feedback": {
+    "policy": "I'll check out your selfies regularly and share what I love about them. This is about getting comfortable with the camera and having fun - no pressure to be perfect! Remember, everyone takes dozens of selfies to get one they like - that's totally normal and part of the process!"
+  },
+
+  "projectCategory": "SELF_PORTRAIT",
+
+  "difficultyLevel": "BEGINNER",
+
+  "technicalFocus": ["Selfie", "Self-expression", "Camera comfort"],
+
+  "equipment": {
+    "required": ["Smartphone with camera"],
+    "optional": ["Tripod", "Remote shutter"]
+  },
+
+  "progressTracking": {
+    "milestones": [
+      {
+        "day": 3,
+        "title": "Halfway There!",
+        "message": "You've completed 3 days of selfies! How do you feel about the process so far?"
+      },
+      {
+        "day": 7,
+        "title": "Challenge Complete!",
+        "message": "Congratulations on completing your first photography challenge! Let's review what you learned."
+      }
+    ]
+  },
+
+  "followUpQuestions": [
+    "Which day's selfie was your favorite and why?",
+    "Did you discover any new angles or expressions you liked?",
+    "What was the most challenging part of taking daily selfies?",
+    "Would you be interested in a more advanced selfie challenge in the future?"
+  ],
+
+  "relatedProjects": ["mirror-portraits", "emotions-challenge", "lighting-basics"],
+
+  "createdAt": "2025-03-24T00:00:00Z",
+  "updatedAt": "2025-03-24T00:00:00Z",
+  "createdBy": "admin",
+  "isActive": true,
+  "isPublished": true
+}
