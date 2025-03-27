@@ -1,0 +1,18 @@
+---
+description: Code formatting and syntax rules for the project
+globs: ["**/*.ts", "**/*.tsx", "**/*.css", "**/*.js", "**/*.jsx"]
+alwaysApply: true
+---
+
+# File Syntax
+
+- Tabs as Spaces
+- 2 space indentation for all files (TypeScript, JavaScript, CSS)
+- 2 space indentation specifically for React components (.tsx files)
+- 2 space indentation specifically for styles (.css files)
+- No whitespace after last code character of the file
+- End file with newline
+- Consistent spacing around operators and after commas
+- One blank line between logical sections
+- No trailing whitespace in lines
+- Maximum line length of 100 characters

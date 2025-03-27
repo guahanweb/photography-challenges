@@ -3,11 +3,14 @@ import { FiSettings, FiX, FiSun, FiMoon, FiLogOut } from 'react-icons/fi';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { UserRole } from '../../types/auth';
+import { ToggleSwitch } from '../forms/ToggleSwitch';
+import { useDebug } from '../../contexts/DebugContext';
 
 export function DebugPanel() {
   const [isOpen, setIsOpen] = useState(false);
   const { theme, setTheme, setSystemPreference, preferences } = useTheme();
   const { user, logout, setRoles } = useAuth();
+  const { saveFormState, loadFormState, isFormBound } = useDebug();
   const [selectedRoles, setSelectedRoles] = useState<UserRole[]>([]);
 
   // Update selected roles when user changes
@@ -46,6 +49,27 @@ export function DebugPanel() {
             </button>
           </div>
 
+          {/* Form State Controls */}
+          <div className="space-y-2 mb-6 pb-6 border-b border-surface-dark dark:border-surface-light">
+            <h4 className="text-base font-medium text-secondary mb-2">Form State</h4>
+            <div className="flex gap-2">
+              <button
+                onClick={saveFormState}
+                disabled={!isFormBound}
+                className={`btn-primary text-sm flex-1 ${!isFormBound ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                Save State
+              </button>
+              <button
+                onClick={loadFormState}
+                disabled={!isFormBound}
+                className={`btn-secondary text-sm flex-1 ${!isFormBound ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                Load State
+              </button>
+            </div>
+          </div>
+
           {/* Auth Controls */}
           <div className="space-y-6 mb-6 pb-6 border-b border-surface-dark dark:border-surface-light">
             <div>
@@ -78,15 +102,10 @@ export function DebugPanel() {
                     className="flex items-center justify-between text-sm text-secondary cursor-pointer"
                   >
                     <span className="capitalize">{role}</span>
-                    <div className="relative inline-flex h-6 w-11 items-center rounded-full bg-surface-dark dark:bg-surface-light cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={selectedRoles.includes(role)}
-                        onChange={() => handleRoleToggle(role)}
-                        className="sr-only peer cursor-pointer"
-                      />
-                      <div className="absolute left-1 h-4 w-4 rounded-full bg-white transition-all peer-checked:translate-x-4 peer-checked:bg-primary-light"></div>
-                    </div>
+                    <ToggleSwitch
+                      checked={selectedRoles.includes(role)}
+                      onChange={() => handleRoleToggle(role)}
+                    />
                   </label>
                 ))}
               </div>
@@ -111,15 +130,10 @@ export function DebugPanel() {
               <div className="space-y-2">
                 <label className="flex items-center justify-between text-sm text-secondary cursor-pointer">
                   <span>Dark Mode</span>
-                  <div className="relative inline-flex h-6 w-11 items-center rounded-full bg-surface-dark dark:bg-surface-light cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={theme === 'dark'}
-                      onChange={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                      className="sr-only peer cursor-pointer"
-                    />
-                    <div className="absolute left-1 h-4 w-4 rounded-full bg-white transition-all peer-checked:translate-x-4 peer-checked:bg-primary-light"></div>
-                  </div>
+                  <ToggleSwitch
+                    checked={theme === 'dark'}
+                    onChange={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                  />
                 </label>
               </div>
             </div>

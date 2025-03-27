@@ -19,7 +19,7 @@ export default function Register() {
     try {
       await register(formData.email, formData.password, formData.name);
       addNotification('success', 'Successfully registered!');
-      navigate('/challenges');
+      navigate('/projects');
     } catch (error) {
       addNotification('error', 'Failed to register. Please try again.');
     }

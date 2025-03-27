@@ -1,0 +1,10 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Frontend Coding Guidance
+
+- Always familiarize yourself with the tailwindcss themes and favor theme classes to direct tailwind classes
+- You should never be using direct color classes or style definitions within components; always favor adding new layers or theme elements and use those
+- Be extremely thoughtful and strategic about state management. Always favor React hooks (useReducer, useContext, etc.) to manage complexity

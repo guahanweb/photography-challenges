@@ -19,8 +19,8 @@ export default function Login() {
       await login(formData.email, formData.password);
       addNotification('success', 'Successfully logged in!');
 
-      // Navigate to the attempted route or default to challenges
-      const from = (location.state as { from?: string })?.from || '/challenges';
+      // Navigate to the attempted route or default to projects
+      const from = (location.state as { from?: string })?.from || '/projects';
       navigate(from, { replace: true });
     } catch (error) {
       addNotification('error', 'Failed to log in. Please check your credentials.');

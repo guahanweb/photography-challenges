@@ -1,144 +1,78 @@
-import React from 'react';
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
+import { AuthGuard } from './AuthGuard';
+import { NoAuthGuard } from './NoAuthGuard';
+import { AdminGuard } from './AdminGuard';
+import { AdminLayout } from '../components/layout/AdminLayout';
+
+// Pages
 import Home from '../pages/Home';
-import Challenges from '../pages/challenges/Challenges';
-import ChallengeDetail from '../pages/challenges/ChallengeDetail';
-import { Profile } from '../pages/Profile';
-import { Settings } from '../pages/Settings';
-import { NotFound } from '../pages/NotFound';
 import Login from '../pages/auth/Login';
 import Register from '../pages/auth/Register';
 import ForgotPassword from '../pages/auth/ForgotPassword';
-import { useAuth } from '../contexts/AuthContext';
+import { Projects } from '../pages/projects/Projects';
+import { ProjectDetail } from '../pages/projects/ProjectDetail';
+import { Profile } from '../pages/Profile';
+import { Settings } from '../pages/Settings';
+import { NotFound } from '../pages/NotFound';
 
-interface RouteWrapperProps {
-  children: React.ReactNode;
-  requireAuth?: boolean;
-  redirectIfAuthenticated?: string;
-}
-
-function RouteWrapper({ children, requireAuth, redirectIfAuthenticated }: RouteWrapperProps) {
-  const { user, isLoading } = useAuth();
-  const location = useLocation();
-
-  // Show loading state while validating
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-light"></div>
-      </div>
-    );
-  }
-
-  // Redirect if authenticated and redirectIfAuthenticated is specified
-  if (redirectIfAuthenticated && user) {
-    // Use the return path from state if available, otherwise use the default redirect
-    const returnPath = (location.state as { from?: string })?.from || redirectIfAuthenticated;
-    return <Navigate to={returnPath} replace state={{}} />;
-  }
-
-  // Redirect to login if not authenticated and requireAuth is true
-  if (requireAuth && !user) {
-    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
-  }
-
-  // Neutral case - render children
-  return <>{children}</>;
-}
-
-// Route group components
-function AuthenticatedRoute({ children }: { children: React.ReactNode }) {
-  return <RouteWrapper requireAuth>{children}</RouteWrapper>;
-}
-
-function UnauthenticatedRoute({ children }: { children: React.ReactNode }) {
-  return <RouteWrapper redirectIfAuthenticated="/">{children}</RouteWrapper>;
-}
-
-function PublicRoute({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
-}
+// Admin Pages
+import { Users } from '../pages/admin/users/Users';
+import { Projects as AdminProjects } from '../pages/admin/projects/Projects';
+import { ProjectForm } from '../pages/admin/projects/ProjectForm';
+import { Settings as AdminSettings } from '../pages/admin/settings/Settings';
 
 export function AppRoutes() {
   return (
     <Routes>
-      {/* Unauthenticated routes (login, register, etc.) */}
+      {/* Unauthenticated routes */}
       <Route
-        path="/login"
         element={
-          <UnauthenticatedRoute>
-            <Login />
-          </UnauthenticatedRoute>
+          <NoAuthGuard>
+            <Outlet />
+          </NoAuthGuard>
         }
-      />
-      <Route
-        path="/register"
-        element={
-          <UnauthenticatedRoute>
-            <Register />
-          </UnauthenticatedRoute>
-        }
-      />
-      <Route
-        path="/forgot-password"
-        element={
-          <UnauthenticatedRoute>
-            <ForgotPassword />
-          </UnauthenticatedRoute>
-        }
-      />
+      >
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+      </Route>
 
       {/* Authenticated routes */}
       <Route
-        path="/"
         element={
-          <AuthenticatedRoute>
-            <Home />
-          </AuthenticatedRoute>
+          <AuthGuard>
+            <Outlet />
+          </AuthGuard>
         }
-      />
-      <Route
-        path="/challenges"
-        element={
-          <AuthenticatedRoute>
-            <Challenges />
-          </AuthenticatedRoute>
-        }
-      />
-      <Route
-        path="/challenges/:id"
-        element={
-          <AuthenticatedRoute>
-            <ChallengeDetail />
-          </AuthenticatedRoute>
-        }
-      />
-      <Route
-        path="/profile"
-        element={
-          <AuthenticatedRoute>
-            <Profile />
-          </AuthenticatedRoute>
-        }
-      />
-      <Route
-        path="/settings"
-        element={
-          <AuthenticatedRoute>
-            <Settings />
-          </AuthenticatedRoute>
-        }
-      />
+      >
+        <Route path="/projects" element={<Projects />} />
+        <Route path="/projects/:projectId" element={<ProjectDetail />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/settings" element={<Settings />} />
+      </Route>
 
-      {/* Public routes (no auth required) */}
+      {/* Admin routes */}
       <Route
-        path="*"
+        path="/admin"
         element={
-          <PublicRoute>
-            <NotFound />
-          </PublicRoute>
+          <AdminGuard>
+            <AdminLayout>
+              <Outlet />
+            </AdminLayout>
+          </AdminGuard>
         }
-      />
+      >
+        <Route index element={<Navigate to="/admin/projects" replace />} />
+        <Route path="users" element={<Users />} />
+        <Route path="projects" element={<AdminProjects />} />
+        <Route path="projects/new" element={<ProjectForm />} />
+        <Route path="projects/:id/edit" element={<ProjectForm />} />
+        <Route path="settings" element={<AdminSettings />} />
+      </Route>
+
+      {/* Public routes - no guard */}
+      <Route path="/" element={<Home />} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }
