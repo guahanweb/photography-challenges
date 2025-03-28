@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useProjects } from '../../../contexts/ProjectsContext';
 import { Project, ProjectCategory, DifficultyLevel, Tip } from '../../../types/projects';
 import { FiArrowLeft, FiPlus, FiTrash2 } from 'react-icons/fi';
 import { ArrayField } from '../../../components/forms/ArrayField';
 import { ToggleSwitch } from '../../../components/forms/ToggleSwitch';
-import { useDebug } from '../../../contexts/DebugContext';
+import { useDebugForm } from '../../../contexts/DebugContext';
 
 const PROJECT_CATEGORIES: ProjectCategory[] = [
   'SELF_PORTRAIT',
@@ -63,7 +63,17 @@ export function ProjectForm() {
     isActive: false,
     isPublished: false,
   });
-  const { bindDebugForm, unbindDebugForm } = useDebug();
+
+  // Memoize the debug form callbacks
+  const getFormState = useCallback(() => formData, [formData]);
+  const setFormState = useCallback((state: Partial<Project>) => setFormData(state), []);
+
+  // Register form with debug system using memoized callbacks
+  useDebugForm({
+    id: 'project-form',
+    getState: getFormState,
+    setState: setFormState,
+  });
 
   useEffect(() => {
     if (id) {
@@ -75,27 +85,6 @@ export function ProjectForm() {
       }
     }
   }, [id, projects, fetchProject]);
-
-  const loadFormState = useCallback((savedState: Partial<Project>) => {
-    setFormData(savedState);
-  }, []);
-
-  const getFormState = useCallback(() => {
-    return formData;
-  }, [formData]);
-
-  // Set up debug form binding
-  useEffect(() => {
-    // Bind the form on mount
-    bindDebugForm(
-      'project-form',
-      () => getFormState(),
-      (state: any) => loadFormState(state)
-    );
-
-    // Unbind on unmount
-    return () => unbindDebugForm();
-  }, []); // Empty deps since callbacks reference stable state setters
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

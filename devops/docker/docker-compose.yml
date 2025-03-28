@@ -12,7 +12,6 @@ services:
       - /app/node_modules
     environment:
       - NODE_ENV=development
-      - VITE_API_URL=${VITE_API_URL}
       - VITE_HOST=0.0.0.0
       - VITE_PORT=${FRONTEND_PORT}
       - VITE_API_URL=http://backend:4000

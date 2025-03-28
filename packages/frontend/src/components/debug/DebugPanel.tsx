@@ -10,7 +10,7 @@ export function DebugPanel() {
   const [isOpen, setIsOpen] = useState(false);
   const { theme, setTheme, setSystemPreference, preferences } = useTheme();
   const { user, logout, setRoles } = useAuth();
-  const { saveFormState, loadFormState, isFormBound } = useDebug();
+  const { activeForm, saveFormState, loadFormState } = useDebug();
   const [selectedRoles, setSelectedRoles] = useState<UserRole[]>([]);
 
   // Update selected roles when user changes
@@ -52,22 +52,23 @@ export function DebugPanel() {
           {/* Form State Controls */}
           <div className="space-y-2 mb-6 pb-6 border-b border-surface-dark dark:border-surface-light">
             <h4 className="text-base font-medium text-secondary mb-2">Form State</h4>
-            <div className="flex gap-2">
-              <button
-                onClick={saveFormState}
-                disabled={!isFormBound}
-                className={`btn-primary text-sm flex-1 ${!isFormBound ? 'opacity-50 cursor-not-allowed' : ''}`}
-              >
-                Save State
-              </button>
-              <button
-                onClick={loadFormState}
-                disabled={!isFormBound}
-                className={`btn-secondary text-sm flex-1 ${!isFormBound ? 'opacity-50 cursor-not-allowed' : ''}`}
-              >
-                Load State
-              </button>
-            </div>
+            {activeForm ? (
+              <>
+                <div className="text-sm text-secondary mb-2">
+                  Active Form: <span className="font-mono">{activeForm.id}</span>
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={saveFormState} className="btn-primary text-sm flex-1">
+                    Save State
+                  </button>
+                  <button onClick={loadFormState} className="btn-secondary text-sm flex-1">
+                    Load State
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="text-sm text-secondary italic">No form currently registered</div>
+            )}
           </div>
 
           {/* Auth Controls */}

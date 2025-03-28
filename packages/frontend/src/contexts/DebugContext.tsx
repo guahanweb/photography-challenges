@@ -1,85 +1,96 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+
+interface DebugForm {
+  id: string;
+  getState: () => any;
+  setState: (state: any) => void;
+}
 
 interface DebugContextType {
-  bindDebugForm: (key: string, getState: () => any, loadState: (state: any) => void) => void;
-  unbindDebugForm: () => void;
+  activeForm: DebugForm | null;
+
+  registerForm: (form: DebugForm) => void;
+  unregisterForm: (id: string) => void;
   saveFormState: () => void;
   loadFormState: () => void;
-  isFormBound: boolean;
-  // ... other existing debug context properties
 }
+
+const STORAGE_PREFIX = 'debug_form_state_';
 
 const DebugContext = createContext<DebugContextType | undefined>(undefined);
 
 export function DebugProvider({ children }: { children: React.ReactNode }) {
-  // ... other existing state
-  const [currentFormKey, setCurrentFormKey] = useState<string | null>(null);
-  const [getFormState, setGetFormState] = useState<(() => any) | null>(null);
-  const [setFormState, setSetFormState] = useState<((state: any) => void) | null>(null);
+  const [activeForm, setActiveForm] = useState<DebugForm | null>(null);
 
-  const bindDebugForm = useCallback(
-    (key: string, getState: () => any, loadState: (state: any) => void) => {
-      // Memoize all values
-      setCurrentFormKey(key);
-      setGetFormState(() => getState);
-      setSetFormState(() => loadState);
-    },
-    []
-  ); // Empty dependency array ensures the binding function remains stable
-
-  const unbindDebugForm = useCallback(() => {
-    setCurrentFormKey(null);
-    setGetFormState(null);
-    setSetFormState(null);
+  const registerForm = useCallback((form: DebugForm) => {
+    console.log('[DebugContext] Registering form:', form.id);
+    setActiveForm(form);
   }, []);
 
-  const isFormBound = currentFormKey !== null && getFormState !== null && setFormState !== null;
+  const unregisterForm = useCallback((id: string) => {
+    console.log('[DebugContext] Unregistering form:', id);
+    setActiveForm(current => (current?.id === id ? null : current));
+  }, []);
 
   const saveFormState = useCallback(() => {
-    if (!currentFormKey || !getFormState) {
-      console.error('Cannot save form state: no form binding initialized');
+    if (!activeForm) {
+      console.warn('[DebugContext] No active form to save state from');
       return;
     }
 
     try {
-      const state = getFormState();
-      const serializedState = JSON.stringify(state);
-      console.log('Saving form state:', currentFormKey, serializedState);
-      localStorage.setItem(`debug_form_${currentFormKey}`, serializedState);
-    } catch (err) {
-      console.error('Failed to save form state:', err);
+      const state = activeForm.getState();
+      localStorage.setItem(`${STORAGE_PREFIX}${activeForm.id}`, JSON.stringify(state));
+      console.log('[DebugContext] Saved form state:', activeForm.id);
+    } catch (error) {
+      console.error('[DebugContext] Error saving form state:', error);
     }
-  }, [currentFormKey, getFormState]);
+  }, [activeForm]);
 
   const loadFormState = useCallback(() => {
-    if (!currentFormKey || !setFormState) {
-      console.error('Cannot load form state: no form binding initialized');
+    if (!activeForm) {
+      console.warn('[DebugContext] No active form to load state into');
       return;
     }
 
     try {
-      const serializedState = localStorage.getItem(`debug_form_${currentFormKey}`);
-      if (serializedState === null) {
+      const stored = localStorage.getItem(`${STORAGE_PREFIX}${activeForm.id}`);
+      if (!stored) {
+        console.warn('[DebugContext] No stored state found for form:', activeForm.id);
         return;
       }
-      const state = JSON.parse(serializedState);
-      console.log('Loading form state:', currentFormKey, state);
-      setFormState(state);
-    } catch (err) {
-      console.error('Failed to load form state:', err);
+
+      const state = JSON.parse(stored);
+      activeForm.setState(state);
+      console.log('[DebugContext] Loaded form state:', activeForm.id);
+    } catch (error) {
+      console.error('[DebugContext] Error loading form state:', error);
     }
-  }, [currentFormKey, setFormState]);
+  }, [activeForm]);
 
   const value = {
-    bindDebugForm,
-    unbindDebugForm,
+    activeForm,
+    registerForm,
+    unregisterForm,
     saveFormState,
     loadFormState,
-    isFormBound,
-    // ... other existing context values
   };
 
   return <DebugContext.Provider value={value}>{children}</DebugContext.Provider>;
+}
+
+export function useDebugForm(config: DebugForm) {
+  const { registerForm, unregisterForm } = useDebug();
+
+  useEffect(() => {
+    registerForm({
+      id: config.id,
+      getState: config.getState,
+      setState: config.setState,
+    });
+
+    return () => unregisterForm(config.id);
+  }, [config.id, config.getState, config.setState, registerForm, unregisterForm]);
 }
 
 export function useDebug() {
