@@ -97,8 +97,16 @@ export function ProjectForm() {
         if (!currentProject) {
           throw new Error('Project not found');
         }
-        await updateProject(id, currentProject.version, formData);
+        // Filter out reserved fields for update
+        const { projectId, version, createdAt, updatedAt, ...updateData } = formData;
+        console.log('[ProjectForm] Updating project:', {
+          id,
+          version: currentProject.version,
+          updateData,
+        });
+        await updateProject(id, currentProject.version, updateData);
       } else {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { projectId, version, createdAt, updatedAt, ...newProject } = formData;
         await createProject(newProject as any);
       }
@@ -114,7 +122,6 @@ export function ProjectForm() {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    console.log('[ProjectForm] handleChange:', { name, value });
 
     // Handle nested paths like "mission.text"
     const path = name.split('.');
@@ -138,28 +145,6 @@ export function ProjectForm() {
         return result;
       });
     }
-  };
-
-  const handleArrayAdd = (field: string) => {
-    setFormData((prev: Record<string, any>) => {
-      const array = [...((prev[field] as string[]) || []), ''];
-      return { ...prev, [field]: array };
-    });
-  };
-
-  const handleArrayRemove = (field: string, index: number) => {
-    setFormData((prev: Record<string, any>) => {
-      const array = ((prev[field] as string[]) || []).filter((_, i) => i !== index);
-      return { ...prev, [field]: array };
-    });
-  };
-
-  const handleArrayChange = (field: string, index: number, value: string) => {
-    setFormData((prev: Record<string, any>) => {
-      const array = [...((prev[field] as string[]) || [])];
-      array[index] = value;
-      return { ...prev, [field]: array };
-    });
   };
 
   return (
@@ -528,35 +513,18 @@ export function ProjectForm() {
             <h2 className="heading-md font-semibold">Technical Details</h2>
           </div>
           <div className="card-body space-y-4">
-            <div className="form-group">
-              <label className="text-base font-normal">Technical Focus Areas</label>
-              {formData.technicalFocus?.map((focus, index) => (
-                <div key={index} className="compound-input-container">
-                  <input
-                    type="text"
-                    value={focus}
-                    onChange={e => handleArrayChange('technicalFocus', index, e.target.value)}
-                    className="input"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => handleArrayRemove('technicalFocus', index)}
-                    className="btn-caution btn-action"
-                  >
-                    <FiTrash2 className="w-4 h-4" />
-                    <span>Remove</span>
-                  </button>
-                </div>
-              ))}
-              <button
-                type="button"
-                onClick={() => handleArrayAdd('technicalFocus')}
-                className="btn-primary text-xs mt-2 flex items-center gap-2"
-              >
-                <FiPlus className="w-4 h-4" />
-                <span>Add Focus Area</span>
-              </button>
-            </div>
+            <ArrayField
+              label="Technical Focus Areas"
+              items={formData.technicalFocus || []}
+              onChange={items =>
+                setFormData(prev => ({
+                  ...prev,
+                  technicalFocus: items,
+                }))
+              }
+              addLabel="Add Technical Focus Area"
+              emptyMessage="No technical focus areas added"
+            />
           </div>
         </section>
 
@@ -660,35 +628,18 @@ export function ProjectForm() {
             <h2 className="heading-md font-semibold">Follow-up Questions</h2>
           </div>
           <div className="card-body space-y-4">
-            <div className="form-group">
-              <label className="text-base font-normal">Questions</label>
-              {formData.followUpQuestions?.map((question, index) => (
-                <div key={index} className="compound-input-container">
-                  <input
-                    type="text"
-                    value={question}
-                    onChange={e => handleArrayChange('followUpQuestions', index, e.target.value)}
-                    className="input"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => handleArrayRemove('followUpQuestions', index)}
-                    className="btn-caution btn-action"
-                  >
-                    <FiTrash2 className="w-4 h-4" />
-                    <span>Remove</span>
-                  </button>
-                </div>
-              ))}
-              <button
-                type="button"
-                onClick={() => handleArrayAdd('followUpQuestions')}
-                className="btn-primary text-xs mt-2 flex items-center gap-2"
-              >
-                <FiPlus className="w-4 h-4" />
-                <span>Add Question</span>
-              </button>
-            </div>
+            <ArrayField
+              label="Follow-up Questions"
+              items={formData.followUpQuestions || []}
+              onChange={items =>
+                setFormData(prev => ({
+                  ...prev,
+                  followUpQuestions: items,
+                }))
+              }
+              addLabel="Add Follow-up Question"
+              emptyMessage="No follow-up questions added"
+            />
           </div>
         </section>
 
@@ -702,29 +653,15 @@ export function ProjectForm() {
               <div className="space-y-4 max-w-xs">
                 <div className="flex items-center gap-3">
                   <ToggleSwitch
-                    checked={formData.isActive || false}
-                    onChange={checked => {
-                      console.log('[ProjectForm] Toggling isActive:', checked);
-                      setFormData(prev => {
-                        const newState = { ...prev, isActive: checked };
-                        console.log('[ProjectForm] New form state:', newState);
-                        return newState;
-                      });
-                    }}
+                    checked={!!formData.isActive}
+                    onChange={checked => setFormData(prev => ({ ...prev, isActive: checked }))}
                   />
                   <span className="text-base">Active</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <ToggleSwitch
                     checked={formData.isPublished || false}
-                    onChange={checked => {
-                      console.log('[ProjectForm] Toggling isPublished:', checked);
-                      setFormData(prev => {
-                        const newState = { ...prev, isPublished: checked };
-                        console.log('[ProjectForm] New form state:', newState);
-                        return newState;
-                      });
-                    }}
+                    onChange={checked => setFormData(prev => ({ ...prev, isPublished: checked }))}
                   />
                   <span className="text-base">Published</span>
                 </div>

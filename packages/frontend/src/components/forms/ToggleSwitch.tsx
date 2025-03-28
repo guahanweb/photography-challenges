@@ -7,11 +7,15 @@ interface ToggleSwitchProps {
 }
 
 export function ToggleSwitch({ checked, onChange, disabled = false }: ToggleSwitchProps) {
-  const handleClick = () => {
-    if (!disabled) {
-      onChange(!checked);
-    }
-  };
+  const handleClick = React.useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (!disabled) {
+        onChange(!checked);
+      }
+    },
+    [checked, disabled, onChange]
+  );
 
   return (
     <div

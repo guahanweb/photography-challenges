@@ -14,8 +14,10 @@ export interface ProjectCreateInput
   createdBy: string;
 }
 
-export interface ProjectUpdateInput
-  extends Partial<Omit<Project, 'projectId' | 'version' | 'createdAt'>> {}
+export interface ProjectUpdateInput extends Partial<Omit<Project, 'projectId'>> {
+  // Allow all fields except projectId to be updated
+  // version, createdAt, and updatedAt will be filtered out in the update method
+}
 
 export class ProjectModel {
   private readonly tableName: string;
@@ -71,22 +73,28 @@ export class ProjectModel {
     input: ProjectUpdateInput
   ): Promise<Project | null> {
     const timestamp = new Date().toISOString();
-    const newVersion = version + 1;
+    // const newVersion = version + 1;
+
+    // Filter out reserved fields that we manage automatically
+    const { version: _, updatedAt: __, createdAt: ___, ...updateFields } = input;
 
     const updateExpressions: string[] = [];
     const expressionAttributeNames: Record<string, string> = {};
     const expressionAttributeValues: Record<string, unknown> = {};
 
-    Object.entries(input).forEach(([key, value]) => {
+    // Handle user-provided fields
+    Object.entries(updateFields).forEach(([key, value]) => {
       updateExpressions.push(`#${key} = :${key}`);
       expressionAttributeNames[`#${key}`] = key;
       expressionAttributeValues[`:${key}`] = value;
     });
 
-    updateExpressions.push('#version = :version, #updatedAt = :updatedAt');
-    expressionAttributeNames['#version'] = 'version';
+    // Add automatic fields
+    // updateExpressions.push('#version = :version');
+    updateExpressions.push('#updatedAt = :updatedAt');
+    // expressionAttributeNames['#version'] = 'version';
     expressionAttributeNames['#updatedAt'] = 'updatedAt';
-    expressionAttributeValues[':version'] = newVersion;
+    // expressionAttributeValues[':version'] = newVersion;
     expressionAttributeValues[':updatedAt'] = timestamp;
 
     const result = await this.docClient.send(

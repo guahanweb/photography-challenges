@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { FiSettings, FiX, FiSun, FiMoon, FiLogOut } from 'react-icons/fi';
+import React, { useState, useEffect, useCallback } from 'react';
+import { FiSettings, FiX, FiLogOut } from 'react-icons/fi';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { UserRole } from '../../types/auth';
 import { ToggleSwitch } from '../forms/ToggleSwitch';
 import { useDebug } from '../../contexts/DebugContext';
+import { DebugSection } from './DebugSection';
 
 export function DebugPanel() {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,27 +13,55 @@ export function DebugPanel() {
   const { user, logout, setRoles } = useAuth();
   const { activeForm, saveFormState, loadFormState } = useDebug();
   const [selectedRoles, setSelectedRoles] = useState<UserRole[]>([]);
+  const [useSystemTheme, setUseSystemTheme] = useState(preferences.systemPreference);
 
-  // Update selected roles when user changes
   useEffect(() => {
     if (user?.roles) {
       setSelectedRoles(user.roles);
     }
   }, [user]);
 
-  const handleRoleToggle = (role: UserRole) => {
-    const newRoles = selectedRoles.includes(role)
-      ? selectedRoles.filter(r => r !== role)
-      : [...selectedRoles, role];
-    setSelectedRoles(newRoles);
-    setRoles(newRoles);
-  };
+  useEffect(() => {
+    setUseSystemTheme(preferences.systemPreference);
+  }, [preferences.systemPreference]);
+
+  const handleRoleToggle = useCallback(
+    (role: UserRole) => {
+      setSelectedRoles(prevRoles => {
+        const newRoles = prevRoles.includes(role)
+          ? prevRoles.filter(r => r !== role)
+          : [...prevRoles, role];
+        setRoles(newRoles);
+        return newRoles;
+      });
+    },
+    [setRoles]
+  );
+
+  const handleThemeToggle = useCallback(
+    (currentTheme: string) => {
+      setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    },
+    [setTheme]
+  );
+
+  const handleSystemPreferenceToggle = useCallback(
+    (checked: boolean) => {
+      setUseSystemTheme(checked);
+      setSystemPreference(checked);
+    },
+    [setSystemPreference]
+  );
+
+  const togglePanel = useCallback(() => {
+    setIsOpen(prev => !prev);
+  }, []);
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
       {/* Toggle Button */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={togglePanel}
         className="btn-secondary p-3 rounded-full shadow-lg"
         aria-label="Debug Panel"
       >
@@ -41,17 +70,16 @@ export function DebugPanel() {
 
       {/* Panel */}
       {isOpen && (
-        <div className="absolute bottom-16 right-0 w-80 bg-surface-light dark:bg-surface-dark rounded-lg shadow-xl p-4">
+        <div className="absolute bottom-16 right-0 min-w-[480px] bg-surface-light dark:bg-surface-dark rounded-lg shadow-xl p-4">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-lg font-semibold text-primary">Debug Panel</h3>
-            <button onClick={() => setIsOpen(false)} className="text-secondary hover:text-primary">
+            <button onClick={togglePanel} className="text-secondary hover:text-primary">
               <FiX className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Form State Controls */}
-          <div className="space-y-2 mb-6 pb-6 border-b border-surface-dark dark:border-surface-light">
-            <h4 className="text-base font-medium text-secondary mb-2">Form State</h4>
+          {/* Form State Section */}
+          <DebugSection title="Form State">
             {activeForm ? (
               <>
                 <div className="text-sm text-secondary mb-2">
@@ -69,60 +97,55 @@ export function DebugPanel() {
             ) : (
               <div className="text-sm text-secondary italic">No form currently registered</div>
             )}
-          </div>
+          </DebugSection>
 
           {/* Auth Controls */}
-          <div className="space-y-6 mb-6 pb-6 border-b border-surface-dark dark:border-surface-light">
-            <div>
-              <h4 className="text-base font-medium text-secondary mb-2">Auth</h4>
-              <div className="space-y-2">
-                {user ? (
-                  <>
-                    <div className="text-sm text-secondary">Logged in as: {user.email}</div>
-                    <button
-                      onClick={logout}
-                      className="btn-secondary flex items-center space-x-2 text-sm"
-                    >
-                      <FiLogOut className="w-4 h-4" />
-                      <span>Logout</span>
-                    </button>
-                  </>
-                ) : (
-                  <div className="text-sm text-secondary">Not logged in</div>
-                )}
-              </div>
-            </div>
-
-            {/* Role Controls */}
-            <div>
-              <h4 className="text-base font-medium text-secondary mb-2">Roles</h4>
-              <div className="space-y-2">
-                {(['admin', 'mentor', 'photographer'] as UserRole[]).map(role => (
-                  <label
-                    key={role}
-                    className="flex items-center justify-between text-sm text-secondary cursor-pointer"
+          <DebugSection title="Auth">
+            <div className="space-y-2">
+              {user ? (
+                <>
+                  <div className="text-sm text-secondary">Logged in as: {user.email}</div>
+                  <button
+                    onClick={logout}
+                    className="btn-secondary flex items-center space-x-2 text-sm"
                   >
-                    <span className="capitalize">{role}</span>
-                    <ToggleSwitch
-                      checked={selectedRoles.includes(role)}
-                      onChange={() => handleRoleToggle(role)}
-                    />
-                  </label>
-                ))}
-              </div>
+                    <FiLogOut className="w-4 h-4" />
+                    <span>Logout</span>
+                  </button>
+                </>
+              ) : (
+                <div className="text-sm text-secondary">Not logged in</div>
+              )}
             </div>
-          </div>
+          </DebugSection>
+
+          {/* Role Controls */}
+          <DebugSection title="Roles">
+            <div className="space-y-2">
+              {(['admin', 'mentor', 'photographer'] as UserRole[]).map(role => (
+                <label
+                  key={role}
+                  className="flex items-center justify-between text-sm text-secondary cursor-pointer"
+                >
+                  <span className="capitalize">{role}</span>
+                  <ToggleSwitch
+                    checked={selectedRoles.includes(role)}
+                    onChange={() => handleRoleToggle(role)}
+                  />
+                </label>
+              ))}
+            </div>
+          </DebugSection>
 
           {/* Theme Controls */}
-          <div className="space-y-4">
+          <DebugSection title="Theme" showBorder={false}>
             <div>
               <div className="flex items-center justify-between mb-2">
-                <h4 className="text-base font-medium text-secondary">Theme</h4>
                 <label className="flex items-center space-x-2 text-sm text-secondary cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={preferences.systemPreference}
-                    onChange={e => setSystemPreference(e.target.checked)}
+                    checked={useSystemTheme}
+                    onChange={e => handleSystemPreferenceToggle(e.target.checked)}
                     className="rounded text-primary-light focus:ring-primary-light cursor-pointer"
                   />
                   <span>Use System Theme</span>
@@ -133,12 +156,12 @@ export function DebugPanel() {
                   <span>Dark Mode</span>
                   <ToggleSwitch
                     checked={theme === 'dark'}
-                    onChange={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                    onChange={() => handleThemeToggle(theme)}
                   />
                 </label>
               </div>
             </div>
-          </div>
+          </DebugSection>
         </div>
       )}
     </div>
