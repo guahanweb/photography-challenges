@@ -20,6 +20,7 @@ const envSchema = z.object({
   DYNAMODB_PROJECT_INSTANCES_TABLE: z
     .string()
     .min(1, 'DYNAMODB_PROJECT_INSTANCES_TABLE is required'),
+  DYNAMODB_INVITATIONS_TABLE: z.string().min(1, 'DYNAMODB_INVITATIONS_TABLE is required'),
 });
 
 const parseEnvVars = () => {
